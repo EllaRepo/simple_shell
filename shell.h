@@ -19,6 +19,8 @@
 #define PATH_COMMAND 3
 #define INVALID_COMMAND -1
 
+#define BUFSIZE 1024
+
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 
 /**
