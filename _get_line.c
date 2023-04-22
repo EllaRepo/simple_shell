@@ -76,7 +76,7 @@ ssize_t _get_line(char **linep, size_t *szp, FILE *fp)
 		ip++;
 	}
 	buff[ip] = '\0';
-	bring_line(linep, szp, buff, ip);
+	__get_line(linep, szp, buff, ip);
 	retval = ip;
 	if (i != 0)
 		ip = 0;
