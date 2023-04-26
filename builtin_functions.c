@@ -107,9 +107,10 @@ void _setenv(sh_t *sh)
 {
 	char *err;
 
-	if (sh->current_command[1] == NULL || sh->current_command[2] == NULL)
+	if (sh->current_command[1] == NULL || sh->current_command[2] == NULL
+		|| sh->current_command[3])
 	{
-		err = "Unable to set env variable\n";
+		err = "Incorrect number of arguments\n";
 		write(STDERR_FILENO, err, _strlen(err));
 		return;
 	}

@@ -108,4 +108,6 @@ void free_env(sh_t *sh);
 extern void non_interactive(sh_t *sh);
 extern void initializer(sh_t *sh);
 
+/*chk syntax error*/
+int chk_syntax_err(sh_t *sh);
 #endif /*SHELL_H*/

@@ -54,8 +54,9 @@ int main(int argc __attribute__((unused)), char **argv)
 		}
 		remove_newline(sh.line);
 		remove_comment(sh.line);
+		if (chk_syntax_err(&sh))
+			continue;
 		sh.commands = tokenizer(sh.line, ";");
-
 		for (i = 0; sh.commands[i] != NULL; i++)
 		{
 			sh.current_command = tokenizer(sh.commands[i], " \t");
@@ -65,7 +66,6 @@ int main(int argc __attribute__((unused)), char **argv)
 				break;
 			}
 			sh.cmd_type = parse_command(sh.current_command[0]);
-
 			/* initializer -   */
 			initializer(&sh);
 			free(sh.current_command);
