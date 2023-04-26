@@ -2,9 +2,9 @@
 
 /**
  * parse_command - determines the type of the command
- * @command: command to be parsed
+ * @sh: shell parameters structure
  *
- * Return: constant representing the type of the command
+ * Return: None
  * Description -
  *		EXTERNAL_COMMAND (1) represents commands like /bin/ls
  *		INTERNAL_COMMAND (2) represents commands like exit, env
@@ -12,31 +12,39 @@
  *		INVALID_COMMAND (-1) represents invalid commands
  */
 
-int parse_command(char *command)
+void parse_command(sh_t *sh)
 {
 	int i;
-	char *internal_command[] = {"env", "exit", "setenv", "unsetenv", NULL};
-	char *path = NULL;
+	char *internal_command[] = {"env", "exit", "setenv", "unsetenv",
+		"cd", NULL};
+	char *path = NULL, *command;
 
+	command =  sh->current_command[0];
 	for (i = 0; command[i] != '\0'; i++)
 	{
 		if (command[i] == '/')
-			return (EXTERNAL_COMMAND);
+		{
+			sh->cmd_type = EXTERNAL_COMMAND;
+			return;
+		}
 	}
 	for (i = 0; internal_command[i] != NULL; i++)
 	{
 		if (_strcmp(command, internal_command[i]) == 0)
-			return (INTERNAL_COMMAND);
+		{
+			sh->cmd_type = INTERNAL_COMMAND;
+			return;
+		}
 	}
 	/* @check_path - checks if a command is found in the PATH */
-	path = check_path(command);
+	path = check_path(sh);
 	if (path != NULL)
 	{
 		free(path);
-		return (PATH_COMMAND);
+		sh->cmd_type = PATH_COMMAND;
+		return;
 	}
-
-	return (INVALID_COMMAND);
+	sh->cmd_type = INVALID_COMMAND;
 }
 
 /**
@@ -53,16 +61,18 @@ void execute_command(sh_t *sh)
 	{
 		if (execve(sh->current_command[0], sh->current_command, environ) == -1)
 		{
-			perror(_getenv("PWD"));
+			perror(_getenv("PWD", sh));
+			free_mallocs(sh);
 			exit(2);
 		}
 	}
 	if (sh->cmd_type == PATH_COMMAND)
 	{
-		if (execve(check_path(sh->current_command[0]),
-			sh->current_command, environ) == -1)
+		if (execve(check_path(sh),
+			sh->current_command, sh->envp) == -1)
 		{
-			perror(_getenv("PWD"));
+			perror(_getenv("PWD", sh));
+			free_mallocs(sh);
 			exit(2);
 		}
 	}
@@ -83,15 +93,15 @@ void execute_command(sh_t *sh)
 
 /**
  * check_path - checks if a command is found in the PATH
- * @command: command to be used
+ * @sh: shell parameters structure
  *
  * Return: path where the command is found in, NULL if not found
  */
-char *check_path(char *command)
+char *check_path(sh_t *sh)
 {
 	char **path_array = NULL;
 	char *temp, *temp2, *path_cpy;
-	char *path = _getenv("PATH");
+	char *path = _getenv("PATH", sh);
 	int i;
 
 	if (path == NULL || _strlen(path) == 0)
@@ -102,7 +112,7 @@ char *check_path(char *command)
 	for (i = 0; path_array[i] != NULL; i++)
 	{
 		temp2 = _strcat(path_array[i], "/");
-		temp = _strcat(temp2, command);
+		temp = _strcat(temp2, sh->current_command[0]);
 		if (access(temp, F_OK) == 0)
 		{
 			free(temp2);
@@ -129,10 +139,10 @@ void (*get_func(char *command))(sh_t *)
 	int i;
 	function_map mapping[] = {
 		{"env", env}, {"exit", quit}, {"setenv", _setenv},
-		{"unsetenv", _unsetenv}
+		{"unsetenv", _unsetenv}, {"cd", cd_sh}
 	};
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 5; i++)
 	{
 		if (_strcmp(command, mapping[i].command_name) == 0)
 			return (mapping[i].func);
@@ -143,16 +153,17 @@ void (*get_func(char *command))(sh_t *)
 /**
  * _getenv - gets the value of an environment variable
  * @name: name of the environment variable
+ * @sh: shell parameters
  *
  * Return: the value of the variable as a string
  */
-char *_getenv(char *name)
+char *_getenv(char *name, sh_t *sh)
 {
 	char **my_environ;
 	char *pair_ptr;
 	char *name_cpy;
 
-	for (my_environ = environ; *my_environ != NULL; my_environ++)
+	for (my_environ = sh->envp; *my_environ != NULL; my_environ++)
 	{
 		for (pair_ptr = *my_environ, name_cpy = name;
 		     *pair_ptr == *name_cpy; pair_ptr++, name_cpy++)

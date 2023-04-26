@@ -26,14 +26,13 @@ void non_interactive(sh_t *sh)
 					free(sh->current_command);
 					break;
 				}
-				sh->cmd_type = parse_command(sh->current_command[0]);
+				parse_command(sh);
 				initializer(sh);
 				free(sh->current_command);
 			}
 			free(sh->commands);
 		}
-		free(sh->line);
-		free_env(sh);
+		free_mallocs(sh);
 		exit(sh->status);
 	}
 }
