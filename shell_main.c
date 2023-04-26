@@ -40,19 +40,19 @@ int main(int argc __attribute__((unused)), char **argv)
 	while (1)
 	{
 		non_interactive(&sh);
-		print(" ($) ", STDOUT_FILENO);
+		print("($) ", STDOUT_FILENO);
 		if (getline(&sh.line, &n, stdin) == -1)
 		{
 			free(sh.line);
 			exit(sh.status);
 		}
-			remove_newline(sh.line);
-			remove_comment(sh.line);
-			sh.commands = tokenizer(sh.line, ";");
+		remove_newline(sh.line);
+		remove_comment(sh.line);
+		sh.commands = tokenizer(sh.line, ";");
 
 		for (i = 0; sh.commands[i] != NULL; i++)
 		{
-			sh.current_command = tokenizer(sh.commands[i], " ");
+			sh.current_command = tokenizer(sh.commands[i], " \t");
 			if (sh.current_command[0] == NULL)
 			{
 				free(sh.current_command);

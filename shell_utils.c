@@ -51,7 +51,7 @@ void execute_command(sh_t *sh)
 
 	if (sh->cmd_type == EXTERNAL_COMMAND)
 	{
-		if (execve(sh->current_command[0], sh->current_command, NULL) == -1)
+		if (execve(sh->current_command[0], sh->current_command, environ) == -1)
 		{
 			perror(_getenv("PWD"));
 			exit(2);
@@ -60,7 +60,7 @@ void execute_command(sh_t *sh)
 	if (sh->cmd_type == PATH_COMMAND)
 	{
 		if (execve(check_path(sh->current_command[0]),
-			sh->current_command, NULL) == -1)
+			sh->current_command, environ) == -1)
 		{
 			perror(_getenv("PWD"));
 			exit(2);
