@@ -20,7 +20,7 @@ void non_interactive(sh_t *sh)
 			sh->commands = tokenizer(sh->line, ";");
 			for (i = 0; sh->commands[i] != NULL; i++)
 			{
-				sh->current_command = tokenizer(sh->commands[i], " ");
+				sh->current_command = tokenizer(sh->commands[i], " \t");
 				if (sh->current_command[0] == NULL)
 				{
 					free(sh->current_command);
@@ -33,6 +33,7 @@ void non_interactive(sh_t *sh)
 			free(sh->commands);
 		}
 		free(sh->line);
+		free_env(sh);
 		exit(sh->status);
 	}
 }

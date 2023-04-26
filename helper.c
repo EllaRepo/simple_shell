@@ -75,7 +75,7 @@ void remove_newline(char *str)
  * Return: void
  */
 
-void _strcpy(char *source, char *dest)
+void _strcpy(char *dest, char *source)
 {
 	int i = 0;
 

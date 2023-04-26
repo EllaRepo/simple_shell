@@ -7,13 +7,13 @@
  *Return: void
  */
 
-void env(sh_t *sh __attribute__((unused)))
+void env(sh_t *sh)
 {
 	int i;
 
-	for (i = 0; environ[i] != NULL; i++)
+	for (i = 0; sh->envp[i] != NULL; i++)
 	{
-		print(environ[i], STDOUT_FILENO);
+		print(sh->envp[i], STDOUT_FILENO);
 		print("\n", STDOUT_FILENO);
 	}
 }
@@ -36,6 +36,7 @@ void quit(sh_t *sh)
 		free(sh->current_command);
 		free(sh->line);
 		free(sh->commands);
+		free_env(sh);
 		exit(sh->status);
 	}
 	else if (num_token == 2)
@@ -54,9 +55,106 @@ void quit(sh_t *sh)
 			free(sh->line);
 			free(sh->current_command);
 			free(sh->commands);
+			free(sh);
 			exit(arg);
 		}
 	}
 	else
 		print("$: exit doesn't take more than one argument\n", STDERR_FILENO);
+}
+/**
+ * set_env - change or add an environment variable
+ * @name: name of the environment
+ * @value: value of the environment
+ * @sh: shell parameter structure
+ *
+ * Return: None.
+ */
+void set_env(char *name, char *value, sh_t *sh)
+{
+	int len, i, j;
+	char **ev, *err;
+
+	len = _strlen(name);
+	for (i = 0; sh->envp[i]; i++)
+	{
+		j = _strncmp(sh->envp[i], name, len);
+		if (j == 0 && sh->envp[i][len] == '=')
+		{
+			free(sh->envp[i]);
+			sh->envp[i] = assemble_env_var(name, value);
+			return;
+		}
+	}
+	ev  = __realloc(sh->envp, i, sizeof(char *) * (i + 2));
+	if (!ev)
+	{
+		err = "Unable to unset4 env variable\n";
+		write(STDERR_FILENO, err, _strlen(err));
+		return;
+	}
+	sh->envp = ev;
+	sh->envp[i] = assemble_env_var(name, value);
+	sh->envp[i + 1] = NULL;
+}
+/**
+ * _setenv - change or add an environment variable
+ * @sh: shell parameters structure
+ *
+ * Return: None
+ */
+void _setenv(sh_t *sh)
+{
+	char *err;
+
+	if (sh->current_command[1] == NULL || sh->current_command[2] == NULL)
+	{
+		err = "Unable to set env variable\n";
+		write(STDERR_FILENO, err, _strlen(err));
+		return;
+	}
+	set_env(sh->current_command[1], sh->current_command[2], sh);
+
+}
+/**
+ * _unsetenv - deletes the variable name from the environment
+ * @sh: shell parameters structure
+ *
+ * Return: None
+ */
+void _unsetenv(sh_t *sh)
+{
+	char **env = sh->envp;
+	char **ptr, *err;
+	int len, bool, i = 1;
+
+	if (sh->current_command[1] == NULL)
+	{
+		err = "No env variable is entered\n";
+		write(STDERR_FILENO, err, _strlen(err));
+		return;
+	}
+	len = _strlen(sh->current_command[1]);
+
+	while (*env)
+	{
+		bool = _strncmp(sh->current_command[1], *env, len);
+		if (bool == 0 && (*env)[len] == '=')
+		{
+			i = 0;
+			for (ptr = env;; ++ptr)
+			{
+				*ptr = *(ptr + 1);
+				if (!(*ptr))
+					break;
+			}
+		}
+		env++;
+	}
+	if (i)
+	{
+		err = "Unable to unset env variable\n";
+		write(STDERR_FILENO, err, _strlen(err));
+		return;
+	}
 }

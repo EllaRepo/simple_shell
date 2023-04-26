@@ -15,7 +15,7 @@
 int parse_command(char *command)
 {
 	int i;
-	char *internal_command[] = {"env", "exit", NULL};
+	char *internal_command[] = {"env", "exit", "setenv", "unsetenv", NULL};
 	char *path = NULL;
 
 	for (i = 0; command[i] != '\0'; i++)
@@ -97,7 +97,7 @@ char *check_path(char *command)
 	if (path == NULL || _strlen(path) == 0)
 		return (NULL);
 	path_cpy = malloc(sizeof(*path_cpy) * (_strlen(path) + 1));
-	_strcpy(path, path_cpy);
+	_strcpy(path_cpy, path);
 	path_array = tokenizer(path_cpy, ":");
 	for (i = 0; path_array[i] != NULL; i++)
 	{
@@ -128,10 +128,11 @@ void (*get_func(char *command))(sh_t *)
 {
 	int i;
 	function_map mapping[] = {
-		{"env", env}, {"exit", quit}
+		{"env", env}, {"exit", quit}, {"setenv", _setenv},
+		{"unsetenv", _unsetenv}
 	};
 
-	for (i = 0; i < 2; i++)
+	for (i = 0; i < 4; i++)
 	{
 		if (_strcmp(command, mapping[i].command_name) == 0)
 			return (mapping[i].func);

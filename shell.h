@@ -30,6 +30,7 @@
  * @shell_name: the program name
  * @current_command: the current command
  * @cmd_type: type of the command
+ * @envp: an array of pointers to environment variables
  * @status: the last execution status
  */
 typedef struct sh
@@ -39,6 +40,7 @@ typedef struct sh
 	char *shell_name;
 	char **current_command;
 	int cmd_type;
+	char **envp;
 	int status;
 } sh_t;
 
@@ -80,7 +82,14 @@ int _atoi(char *);
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
 void ctrl_c_handler(int);
 void remove_comment(char *);
-
+/*helper4*/
+char *assemble_env_var(char *name, char *value);
+int _strncmp(char *str1, char *str2, size_t n);
+char **__realloc(char **pptr, unsigned int old_sz, unsigned int new_sz);
+char *_strdup(char *s);
+void _memcpy(void *newptr, const void *ptr, unsigned int size);
+/*helper5*/
+char *__strcat(char *dest, char *src);
 /*utils*/
 int parse_command(char *);
 void execute_command(sh_t *sh);
@@ -91,6 +100,9 @@ char *_getenv(char *);
 /*built_in*/
 void env(sh_t *sh);
 void quit(sh_t *sh);
+void _setenv(sh_t *sh);
+void _unsetenv(sh_t *sh);
+void free_env(sh_t *sh);
 
 /*main*/
 extern void non_interactive(sh_t *sh);

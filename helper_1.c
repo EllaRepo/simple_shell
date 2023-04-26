@@ -36,8 +36,8 @@ char *_strcat(char *destination, char *source)
 	int len_source = _strlen(source);
 
 	new_string = malloc(sizeof(*new_string) * (len_dest + len_source + 1));
-	_strcpy(destination, new_string);
-	_strcpy(source, new_string + len_dest);
+	_strcpy(new_string, destination);
+	_strcpy(new_string + len_dest, source);
 	new_string[len_dest + len_source] = '\0';
 	return (new_string);
 }
@@ -105,4 +105,3 @@ char *_strchr(char *s, char c)
 	else
 		return (NULL);
 }
-

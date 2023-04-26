@@ -9,12 +9,20 @@
 */
 void init(sh_t *sh, char **argv)
 {
+	unsigned int i;
+
 	sh->commands = NULL;
 	sh->line = NULL;
 	sh->current_command = NULL;
 	sh->shell_name = argv[0];
 	sh->cmd_type = 0;
 	sh->status = 0;
+	for (i = 0; environ[i]; i++)
+		;
+	sh->envp = malloc(sizeof(char *) * (i + 1));
+	for (i = 0; environ[i]; i++)
+		sh->envp[i] = _strdup(environ[i]);
+	sh->envp[i] = NULL;
 }
 
 /**
@@ -27,8 +35,6 @@ void init(sh_t *sh, char **argv)
  * Prints error on Failure
  * Return: 0 on success
  */
-
-
 int main(int argc __attribute__((unused)), char **argv)
 {
 	sh_t sh;
@@ -67,6 +73,6 @@ int main(int argc __attribute__((unused)), char **argv)
 		free(sh.commands);
 	}
 	free(sh.line);
-
+	free_env(&sh);
 	return (sh.status);
 }
