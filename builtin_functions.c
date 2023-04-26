@@ -1,13 +1,13 @@
 #include "shell.h"
 
 /**
- *env - prints the current_environnement
- *@tokenized_command: command entered
+ * env - prints the current_environnement
+ * @sh: shell parameters structure
  *
  *Return: void
  */
 
-void env(char **tokenized_command __attribute__((unused)))
+void env(sh_t *sh __attribute__((unused)))
 {
 	int i;
 
@@ -20,40 +20,40 @@ void env(char **tokenized_command __attribute__((unused)))
 
 /**
  * quit - exits the shell
- * @tokenized_command: command entered
+ * @sh: shell parameters structure
  *
  * Return: void
  */
 
-void quit(char **tokenized_command)
+void quit(sh_t *sh)
 {
 	int num_token = 0, arg;
 
-	for (; tokenized_command[num_token] != NULL; num_token++)
+	for (; sh->current_command[num_token] != NULL; num_token++)
 		;
 	if (num_token == 1)
 	{
-		free(tokenized_command);
-		free(line);
-		free(commands);
-		exit(status);
+		free(sh->current_command);
+		free(sh->line);
+		free(sh->commands);
+		exit(sh->status);
 	}
 	else if (num_token == 2)
 	{
-		arg = _atoi(tokenized_command[1]);
+		arg = _atoi(sh->current_command[1]);
 		if (arg == -1)
 		{
-			print(shell_name, STDERR_FILENO);
+			print(sh->shell_name, STDERR_FILENO);
 			print(": 1: exit: Illegal number: ", STDERR_FILENO);
-			print(tokenized_command[1], STDERR_FILENO);
+			print(sh->current_command[1], STDERR_FILENO);
 			print("\n", STDERR_FILENO);
-			status = 2;
+			sh->status = 2;
 		}
 		else
 		{
-			free(line);
-			free(tokenized_command);
-			free(commands);
+			free(sh->line);
+			free(sh->current_command);
+			free(sh->commands);
 			exit(arg);
 		}
 	}

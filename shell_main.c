@@ -1,10 +1,21 @@
 #include "shell.h"
 
-
-	char **commands = NULL;
-	char *line = NULL;
-	char *shell_name = NULL;
-	int status = 0;
+/**
+ * init - initializes shell parameters
+ * @sh: shell parameters structure
+ * @argv: argument vector
+ *
+ * Return: None
+*/
+void init(sh_t *sh, char **argv)
+{
+	sh->commands = NULL;
+	sh->line = NULL;
+	sh->current_command = NULL;
+	sh->shell_name = argv[0];
+	sh->cmd_type = 0;
+	sh->status = 0;
+}
 
 /**
  * main - the main shell code
@@ -20,42 +31,42 @@
 
 int main(int argc __attribute__((unused)), char **argv)
 {
-	char **current_command = NULL;
-	int i, type_command = 0;
+	sh_t sh;
+	int i;
 	size_t n = 0;
 
 	signal(SIGINT, ctrl_c_handler);
-	shell_name = argv[0];
+	init(&sh, argv);
 	while (1)
 	{
-		non_interactive();
+		non_interactive(&sh);
 		print(" ($) ", STDOUT_FILENO);
-		if (getline(&line, &n, stdin) == -1)
+		if (getline(&sh.line, &n, stdin) == -1)
 		{
-			free(line);
-			exit(status);
+			free(sh.line);
+			exit(sh.status);
 		}
-			remove_newline(line);
-			remove_comment(line);
-			commands = tokenizer(line, ";");
+			remove_newline(sh.line);
+			remove_comment(sh.line);
+			sh.commands = tokenizer(sh.line, ";");
 
-		for (i = 0; commands[i] != NULL; i++)
+		for (i = 0; sh.commands[i] != NULL; i++)
 		{
-			current_command = tokenizer(commands[i], " ");
-			if (current_command[0] == NULL)
+			sh.current_command = tokenizer(sh.commands[i], " ");
+			if (sh.current_command[0] == NULL)
 			{
-				free(current_command);
+				free(sh.current_command);
 				break;
 			}
-			type_command = parse_command(current_command[0]);
+			sh.cmd_type = parse_command(sh.current_command[0]);
 
 			/* initializer -   */
-			initializer(current_command, type_command);
-			free(current_command);
+			initializer(&sh);
+			free(sh.current_command);
 		}
-		free(commands);
+		free(sh.commands);
 	}
-	free(line);
+	free(sh.line);
 
-	return (status);
+	return (sh.status);
 }

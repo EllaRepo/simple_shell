@@ -2,38 +2,37 @@
 
 /**
  * non_interactive - handles non_interactive mode
- *
+ * @sh: shell parameters structure
  * Return: void
  */
 
-void non_interactive(void)
+void non_interactive(sh_t *sh)
 {
-	char **current_command = NULL;
-	int i, type_command = 0;
+	int i;
 	size_t n = 0;
 
 	if (!(isatty(STDIN_FILENO)))
 	{
-		while (getline(&line, &n, stdin) != -1)
+		while (getline(&sh->line, &n, stdin) != -1)
 		{
-			remove_newline(line);
-			remove_comment(line);
-			commands = tokenizer(line, ";");
-			for (i = 0; commands[i] != NULL; i++)
+			remove_newline(sh->line);
+			remove_comment(sh->line);
+			sh->commands = tokenizer(sh->line, ";");
+			for (i = 0; sh->commands[i] != NULL; i++)
 			{
-				current_command = tokenizer(commands[i], " ");
-				if (current_command[0] == NULL)
+				sh->current_command = tokenizer(sh->commands[i], " ");
+				if (sh->current_command[0] == NULL)
 				{
-					free(current_command);
+					free(sh->current_command);
 					break;
 				}
-				type_command = parse_command(current_command[0]);
-				initializer(current_command, type_command);
-				free(current_command);
+				sh->cmd_type = parse_command(sh->current_command[0]);
+				initializer(sh);
+				free(sh->current_command);
 			}
-			free(commands);
+			free(sh->commands);
 		}
-		free(line);
-		exit(status);
+		free(sh->line);
+		exit(sh->status);
 	}
 }

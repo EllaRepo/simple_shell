@@ -24,6 +24,25 @@
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 
 /**
+ * struct sh - a struct that holds shell parameters
+ * @commands: splited commands user entered
+ * @line: string from getline function
+ * @shell_name: the program name
+ * @current_command: the current command
+ * @cmd_type: type of the command
+ * @status: the last execution status
+ */
+typedef struct sh
+{
+	char **commands;
+	char *line;
+	char *shell_name;
+	char **current_command;
+	int cmd_type;
+	int status;
+} sh_t;
+
+/**
  *struct map - a struct that maps a command name to a function
  *@command_name: name of the command
  *@func: the function that executes the command
@@ -32,7 +51,7 @@
 typedef struct map
 {
 	char *command_name;
-	void (*func)(char **command);
+	void (*func)(sh_t *sh);
 } function_map;
 
 extern char **environ;
@@ -64,20 +83,17 @@ void remove_comment(char *);
 
 /*utils*/
 int parse_command(char *);
-void execute_command(char **, int);
+void execute_command(sh_t *sh);
 char *check_path(char *);
-void (*get_func(char *))(char **);
+void (*get_func(char *))(sh_t *);
 char *_getenv(char *);
 
 /*built_in*/
-void env(char **);
-void quit(char **);
+void env(sh_t *sh);
+void quit(sh_t *sh);
 
 /*main*/
-extern void non_interactive(void);
-extern void initializer(char **current_command, int type_command);
+extern void non_interactive(sh_t *sh);
+extern void initializer(sh_t *sh);
 
 #endif /*SHELL_H*/
-
-
-

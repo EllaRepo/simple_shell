@@ -41,43 +41,43 @@ int parse_command(char *command)
 
 /**
  * execute_command - executes a command based on it's type
- * @tokenized_command: tokenized form of the command (ls -l == {ls, -l, NULL})
- * @command_type: type of the command
+ * @sh: shell parameters struture
  *
  * Return: void
  */
-void execute_command(char **tokenized_command, int command_type)
+void execute_command(sh_t *sh)
 {
-	void (*func)(char **command);
+	void (*func)(sh_t *sh);
 
-	if (command_type == EXTERNAL_COMMAND)
+	if (sh->cmd_type == EXTERNAL_COMMAND)
 	{
-		if (execve(tokenized_command[0], tokenized_command, NULL) == -1)
+		if (execve(sh->current_command[0], sh->current_command, NULL) == -1)
 		{
 			perror(_getenv("PWD"));
 			exit(2);
 		}
 	}
-	if (command_type == PATH_COMMAND)
+	if (sh->cmd_type == PATH_COMMAND)
 	{
-		if (execve(check_path(tokenized_command[0]), tokenized_command, NULL) == -1)
+		if (execve(check_path(sh->current_command[0]),
+			sh->current_command, NULL) == -1)
 		{
 			perror(_getenv("PWD"));
 			exit(2);
 		}
 	}
-	if (command_type == INTERNAL_COMMAND)
+	if (sh->cmd_type == INTERNAL_COMMAND)
 	{
-		func = get_func(tokenized_command[0]);
-		func(tokenized_command);
+		func = get_func(sh->current_command[0]);
+		func(sh);
 	}
-	if (command_type == INVALID_COMMAND)
+	if (sh->cmd_type == INVALID_COMMAND)
 	{
-		print(shell_name, STDERR_FILENO);
+		print(sh->shell_name, STDERR_FILENO);
 		print(": 1: ", STDERR_FILENO);
-		print(tokenized_command[0], STDERR_FILENO);
+		print(sh->current_command[0], STDERR_FILENO);
 		print(": not found\n", STDERR_FILENO);
-		status = 127;
+		sh->status = 127;
 	}
 }
 
@@ -124,7 +124,7 @@ char *check_path(char *command)
  *
  * Return: pointer to the proper function, or null on fail
  */
-void (*get_func(char *command))(char **)
+void (*get_func(char *command))(sh_t *)
 {
 	int i;
 	function_map mapping[] = {
