@@ -55,7 +55,7 @@ void quit(sh_t *sh)
 			free(sh->line);
 			free(sh->current_command);
 			free(sh->commands);
-			free(sh);
+			free_env(sh);
 			exit(arg);
 		}
 	}
