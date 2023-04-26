@@ -33,7 +33,10 @@ void quit(sh_t *sh)
 		;
 	if (num_token == 1)
 	{
-		free_mallocs(sh);
+		free(sh->current_command);
+		free(sh->line);
+		free(sh->commands);
+		free_env(sh);
 		exit(sh->status);
 	}
 	else if (num_token == 2)
@@ -49,7 +52,10 @@ void quit(sh_t *sh)
 		}
 		else
 		{
-			free_mallocs(sh);
+			free(sh->line);
+			free(sh->current_command);
+			free(sh->commands);
+			free(sh);
 			exit(arg);
 		}
 	}
@@ -83,7 +89,7 @@ void set_env(char *name, char *value, sh_t *sh)
 	ev  = __realloc(sh->envp, i, sizeof(char *) * (i + 2));
 	if (!ev)
 	{
-		err = "Unable to unset env variable\n";
+		err = "Unable to unset4 env variable\n";
 		write(STDERR_FILENO, err, _strlen(err));
 		return;
 	}
@@ -118,8 +124,9 @@ void _setenv(sh_t *sh)
  */
 void _unsetenv(sh_t *sh)
 {
-	char **env, *err;
-	int len, bool, i, j, k;
+	char **env = sh->envp;
+	char **ptr, *err;
+	int len, bool, i = 1;
 
 	if (sh->current_command[1] == NULL)
 	{
@@ -128,30 +135,26 @@ void _unsetenv(sh_t *sh)
 		return;
 	}
 	len = _strlen(sh->current_command[1]);
-	k = -1;
-	for (i = 0; sh->envp[i]; i++)
+
+	while (*env)
 	{
-		bool = _strncmp(sh->current_command[1], sh->envp[i], len);
-		if (bool == 0 && sh->envp[i][len] == '=')
-			k = i;
+		bool = _strncmp(sh->current_command[1], *env, len);
+		if (bool == 0 && (*env)[len] == '=')
+		{
+			i = 0;
+			for (ptr = env;; ++ptr)
+			{
+				*ptr = *(ptr + 1);
+				if (!(*ptr))
+					break;
+			}
+		}
+		env++;
 	}
-	if (k == -1)
+	if (i)
 	{
 		err = "Unable to unset env variable\n";
 		write(STDERR_FILENO, err, _strlen(err));
 		return;
 	}
-	env = malloc(sizeof(char *) * (i));
-	for (i = j = 0; sh->envp[i]; i++)
-	{
-		if (i != k)
-		{
-			env[j] = sh->envp[i];
-			j++;
-		}
-	}
-	env[j] = NULL;
-	free(sh->envp[k]);
-	free(sh->envp);
-	sh->envp = env;
 }

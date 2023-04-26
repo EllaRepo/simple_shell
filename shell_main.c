@@ -49,7 +49,7 @@ int main(int argc __attribute__((unused)), char **argv)
 		print("($) ", STDOUT_FILENO);
 		if (getline(&sh.line, &n, stdin) == -1)
 		{
-			free_mallocs(&sh);
+			free(sh.line);
 			exit(sh.status);
 		}
 		remove_newline(sh.line);
@@ -61,17 +61,18 @@ int main(int argc __attribute__((unused)), char **argv)
 			sh.current_command = tokenizer(sh.commands[i], " \t");
 			if (sh.current_command[0] == NULL)
 			{
-				_free(sh.current_command);
+				free(sh.current_command);
 				break;
 			}
-			parse_command(&sh);
+			sh.cmd_type = parse_command(sh.current_command[0]);
 
 			/* initializer -   */
 			initializer(&sh);
-			_free(sh.current_command);
+			free(sh.current_command);
 		}
-		_free(sh.commands);
+		free(sh.commands);
 	}
-	free_mallocs(&sh);
+	free(sh.line);
+	free_env(&sh);
 	return (sh.status);
 }

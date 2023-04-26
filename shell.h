@@ -90,26 +90,19 @@ char *_strdup(char *s);
 void _memcpy(void *newptr, const void *ptr, unsigned int size);
 /*helper5*/
 char *__strcat(char *dest, char *src);
-void _rev_string(char *s);
-int check_delim(char *str, char *delim);
-char *_strtok(char *str, char *delim);
 /*utils*/
-void parse_command(sh_t *);
+int parse_command(char *);
 void execute_command(sh_t *sh);
-char *check_path(sh_t *);
+char *check_path(char *);
 void (*get_func(char *))(sh_t *);
-char *_getenv(char *, sh_t *);
+char *_getenv(char *);
 
 /*built_in*/
 void env(sh_t *sh);
 void quit(sh_t *sh);
 void _setenv(sh_t *sh);
 void _unsetenv(sh_t *sh);
-void free_mallocs(sh_t *sh);
-void cd_sh(sh_t *sh);
-void set_env(char *name, char *value, sh_t *sh);
-void cd_error(sh_t *sh);
-void _free(void *ptr);
+void free_env(sh_t *sh);
 
 /*main*/
 extern void non_interactive(sh_t *sh);
