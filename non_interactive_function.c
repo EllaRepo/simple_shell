@@ -86,6 +86,7 @@ void exec_cmd_from_file(sh_t *sh)
 		print(err, STDERR_FILENO);
 		print(sh->filename, STDERR_FILENO);
 		print("\n", STDERR_FILENO);
+		free_env(sh);
 		exit(127);
 	}
 	i = 0;
