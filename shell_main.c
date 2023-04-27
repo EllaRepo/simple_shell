@@ -39,43 +39,13 @@ void init(sh_t *sh, char **argv)
 int main(int argc, char **argv)
 {
 	sh_t sh;
-	int i;
-	size_t n = 0;
 
 	signal(SIGINT, ctrl_c_handler);
 	init(&sh, argv);
 	if (argc == 2)
 		exec_cmd_from_file(&sh);
-	while (1)
-	{
-		non_interactive(&sh);
-		print("($) ", STDOUT_FILENO);
-		if (getline(&sh.line, &n, stdin) == -1)
-		{
-			free(sh.line);
-			exit(sh.status);
-		}
-		remove_newline(sh.line);
-		remove_comment(sh.line);
-		if (chk_syntax_err(&sh))
-			continue;
-		sh.commands = tokenizer(sh.line, ";");
-		for (i = 0; sh.commands[i] != NULL; i++)
-		{
-			sh.current_command = tokenizer(sh.commands[i], " \t");
-			if (sh.current_command[0] == NULL)
-			{
-				free(sh.current_command);
-				break;
-			}
-			sh.cmd_type = parse_command(sh.current_command[0]);
-			/* initializer -   */
-			initializer(&sh);
-			free(sh.current_command);
-		}
-		free(sh.commands);
-	}
-	free(sh.line);
-	free_env(&sh);
+	non_interactive(&sh);
+	shell_loop(&sh);
+
 	return (sh.status);
 }
