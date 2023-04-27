@@ -127,7 +127,7 @@ void _unsetenv(sh_t *sh)
 {
 	char **env = sh->envp;
 	char **ptr, *err;
-	int len, bool, i = 1;
+	int len, bool;
 
 	if (sh->current_command[1] == NULL)
 	{
@@ -142,7 +142,6 @@ void _unsetenv(sh_t *sh)
 		bool = _strncmp(sh->current_command[1], *env, len);
 		if (bool == 0 && (*env)[len] == '=')
 		{
-			i = 0;
 			for (ptr = env;; ++ptr)
 			{
 				*ptr = *(ptr + 1);
@@ -151,11 +150,5 @@ void _unsetenv(sh_t *sh)
 			}
 		}
 		env++;
-	}
-	if (i)
-	{
-		err = "Unable to unset env variable\n";
-		write(STDERR_FILENO, err, _strlen(err));
-		return;
 	}
 }
