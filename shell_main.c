@@ -48,7 +48,8 @@ int main(int argc, char **argv)
 		exec_cmd_from_file(&sh);
 	while (1)
 	{
-		write(STDIN_FILENO, "($) ", 4);
+		non_interactive(&sh);
+		print("($) ", STDOUT_FILENO);
 		if (getline(&sh.line, &n, stdin) == -1)
 		{
 			free(sh.line);
