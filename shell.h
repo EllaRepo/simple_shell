@@ -11,7 +11,7 @@
 #include <errno.h>
 #include <dirent.h>
 #include <signal.h>
-
+#include <fcntl.h>
 
 /*constants*/
 #define EXTERNAL_COMMAND 1
@@ -31,6 +31,7 @@
  * @current_command: the current command
  * @cmd_type: type of the command
  * @envp: an array of pointers to environment variables
+ * @filename: file name passed as input
  * @status: the last execution status
  */
 typedef struct sh
@@ -41,6 +42,7 @@ typedef struct sh
 	char **current_command;
 	int cmd_type;
 	char **envp;
+	char *filename;
 	int status;
 } sh_t;
 
@@ -107,6 +109,7 @@ void free_env(sh_t *sh);
 /*main*/
 extern void non_interactive(sh_t *sh);
 extern void initializer(sh_t *sh);
+void exec_cmd_from_file(sh_t *sh);
 
 /*chk syntax error*/
 int chk_syntax_err(sh_t *sh);

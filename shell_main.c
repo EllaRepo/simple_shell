@@ -16,6 +16,7 @@ void init(sh_t *sh, char **argv)
 	sh->current_command = NULL;
 	sh->shell_name = argv[0];
 	sh->cmd_type = 0;
+	sh->filename = argv[1] ? argv[1] : NULL;
 	sh->status = 0;
 	for (i = 0; environ[i]; i++)
 		;
@@ -35,7 +36,7 @@ void init(sh_t *sh, char **argv)
  * Prints error on Failure
  * Return: 0 on success
  */
-int main(int argc __attribute__((unused)), char **argv)
+int main(int argc, char **argv)
 {
 	sh_t sh;
 	int i;
@@ -43,10 +44,11 @@ int main(int argc __attribute__((unused)), char **argv)
 
 	signal(SIGINT, ctrl_c_handler);
 	init(&sh, argv);
+	if (argc == 2)
+		exec_cmd_from_file(&sh);
 	while (1)
 	{
-		non_interactive(&sh);
-		print("($) ", STDOUT_FILENO);
+		write(STDIN_FILENO, "($) ", 4);
 		if (getline(&sh.line, &n, stdin) == -1)
 		{
 			free(sh.line);
