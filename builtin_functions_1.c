@@ -89,9 +89,9 @@ void cd_dir(sh_t *sh)
 	if (chdir(dir) == -1)
 	{
 		print(sh->shell_name, STDERR_FILENO);
-		print(": ", STDERR_FILENO);
-		print("cd: ", STDERR_FILENO);
-		perror(dir);
+		print(": 1: cd: can't cd to ", STDERR_FILENO);
+		print(dir, STDERR_FILENO);
+		print("\n", STDERR_FILENO);
 		return;
 	}
 	set_env("OLDPWD", cwd, sh);
