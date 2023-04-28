@@ -127,7 +127,7 @@ void _unsetenv(sh_t *sh)
 {
 	char **env = sh->envp;
 	char **ptr, *err;
-	int len, bool, i, j ,k = -1;
+	int len, bool, i, j, k = -1;
 
 	if (sh->current_command[1] == NULL)
 	{
