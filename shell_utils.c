@@ -15,7 +15,10 @@
 int parse_command(char *command)
 {
 	int i;
-	char *internal_command[] = {"env", "exit", "setenv", "unsetenv", NULL};
+	char *internal_command[] = {
+		"env", "exit", "setenv",
+		"unsetenv", "cd", NULL
+	};
 	char *path = NULL;
 
 	for (i = 0; command[i] != '\0'; i++)
@@ -129,10 +132,10 @@ void (*get_func(char *command))(sh_t *)
 	int i;
 	function_map mapping[] = {
 		{"env", env}, {"exit", quit}, {"setenv", _setenv},
-		{"unsetenv", _unsetenv}
+		{"unsetenv", _unsetenv}, {"cd", cd_sh}
 	};
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 5; i++)
 	{
 		if (_strcmp(command, mapping[i].command_name) == 0)
 			return (mapping[i].func);

@@ -105,6 +105,9 @@ void quit(sh_t *sh);
 void _setenv(sh_t *sh);
 void _unsetenv(sh_t *sh);
 void free_env(sh_t *sh);
+void cd_sh(sh_t *sh);
+char *get_env(char *, char **);
+void set_env(char *, char *, sh_t *);
 
 /*main*/
 extern void non_interactive(sh_t *sh);
